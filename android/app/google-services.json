@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1096852808895",
+    "firebase_url": "https://chatbotaiassistant-afdf6-default-rtdb.firebaseio.com",
+    "project_id": "chatbotaiassistant-afdf6",
+    "storage_bucket": "chatbotaiassistant-afdf6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1096852808895:android:7dbae538ad300f0558520a",
+        "android_client_info": {
+          "package_name": "com.essaywriter.aichatbot.chatassistant.aiassistant.chatai.khattak"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1096852808895-2r9iniurjibbnrkejpphkmk7legt9c9o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.essaywriter.aichatbot.chatassistant.aiassistant.chatai.khattak",
+            "certificate_hash": "d0e0afcf441f6d3f74bdb85cafc771c077de2551"
+          }
+        },
+        {
+          "client_id": "1096852808895-ljfbscrhp47ln1l7qqpnso2b0npmgstv.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAVAka3BIwJBFqXkfgdAQ4wgh2w-w3kDIE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1096852808895-ljfbscrhp47ln1l7qqpnso2b0npmgstv.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
