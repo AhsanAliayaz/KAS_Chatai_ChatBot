@@ -88,7 +88,9 @@ export const styles = StyleSheet.create({
     paddingVertical: 20
   },
   row: {
+    
     flexDirection: 'row',
+    // backgroundColor: 'pink',
     alignItems: 'center'
   },
   rowSpread: {
@@ -292,7 +294,8 @@ export const styles = StyleSheet.create({
     backgroundColor: colors.accent,
     borderBottomLeftRadius: chatCardBorderRadius,
     borderBottomRightRadius: chatCardBorderRadius,
-    minHeight: 150
+    minHeight: 100,
+    
   },
   chatCardMessage: {
     color: colors.primaryText,

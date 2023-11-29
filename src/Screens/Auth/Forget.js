@@ -6,10 +6,12 @@ import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-nat
 import SubmitButton from '../../Components/Subnitbutton/SubmitButton';
 import Loader from '../../Components/Loader/Loader';
 import auth from '@react-native-firebase/auth';
+
+
 export default function Forget({navigation}) {
 
     
-
+ 
 
     const [loading, setLoading] = useState(false)
     const [email, setEmail] = useState('');
@@ -38,17 +40,20 @@ export default function Forget({navigation}) {
                 {/* <Text style={{ ...styles.h1, marginTop: 20 }} >Hello</Text>
                     <Text style={{ ...styles.h1 }} >You've been missed</Text> */}
             </View>
-            <View style={{ width: wp(90), height: wp(70),  alignSelf: 'center', justifyContent: 'flex-end' }}>
+            <View style={{width: wp(90),alignSelf: 'center', }}>
+              <Text style={{fontFamily: fonts['Poppins-Medium'],color:colors.white}}>Enter your email to reset password.</Text>
+            </View>
+            <View style={{ width: wp(90), height: wp(20),  alignSelf: 'center', justifyContent: 'flex-end' }}>
                 <TextInputauth1  
               emailstate={email} setEmail={(text) => { setEmail(text)}}
 
                 placeholder={'Enter your Email'} 
-                Icon={require('../../assets/images/user.png')}
+                Icon={require('../../assets/images/mail.png')}
                 />
             </View>
-            <View style={{width: wp(90),alignSelf: 'center',marginVertical: wp(30)}}>
+            <View style={{width: wp(90),alignSelf: 'center',marginVertical: wp(20)}}>
                 <SubmitButton 
-                title={'Forget Password'}
+                title={'Done'}
                 onPress={() => handlePasswordReset()}
                 style={{ width: wp(90), height: wp(14), backgroundColor: colors.secondary, borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', }}
                 styleText={{color: colors.white,fontSize: 14,fontFamily:fonts["Poppins-Bold"],right: wp(3),}}

@@ -13,6 +13,8 @@ import InitialScreen from '../Screens/Auth/InitialScreen';
 import Chatscreen from '../Screens/Homescreen/Chatscreen';
 import { useDispatch, useSelector } from 'react-redux';
 import Forget from '../Screens/Auth/Forget';
+import Profile from '../Screens/Homescreen/Profile.js/Profile';
+
 
 
 
@@ -26,9 +28,9 @@ const Stack = createStackNavigator();
 export default function StackNav() {
 
 
-    const {userData} = useSelector((state) => state.USER);
+    const {userData} = useSelector(state => state.USER);
 
-    console.log("userdata",userData)
+    // console.log("userdata??????????????????//",userData)
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{
@@ -49,6 +51,7 @@ export default function StackNav() {
                 <Fragment>
                 <Stack.Screen name="BottomTab" component={BottomTab} options={{ headerShown: false}}/>
                 <Stack.Screen name="Chatscreen" component={Chatscreen} options={{ headerShown: false}}/>
+                <Stack.Screen name="Profile" component={Profile} options={{ headerShown: false}}/>
                
                 </Fragment>
                 )

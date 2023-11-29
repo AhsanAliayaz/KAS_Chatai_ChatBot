@@ -72,77 +72,163 @@ export default function Signin({ navigation }) {
     };
 
 
-    const handleSignIn = async () => {
-        setLoading(true);
-        if (validation()) {
-          try {
-            const authResponse = await auth().signInWithEmailAndPassword(Email, Password);
-      
-            // Get user data from Firebase Realtime Database
-            const userSnapshot = await database()
-              .ref('Users/' + authResponse.user.uid)
-              .once('value');
-      
-            if (userSnapshot.exists()) {
-              const userData = {
-                userId: authResponse.user.uid,
-                ...userSnapshot.val(), // Include other necessary fields here
-              };
-              setLoading(false);
-      
-              // Dispatch the serialized user data
-              dispatch(adduser(userData));
-              // navigation.navigate('BottomTab');
-            } else {
-              setLoading(false);
-              Alert.alert('Error', 'User data not found in Realtime Database.');
-            }
-          } catch (error) {
-            console.error('Error signing in:', error.message);
-            setLoading(false);
-            Alert.alert('Error', error.message);
-            // Handle sign-in error, e.g., show an error message to the user
-          }
-        }
-      };
-
-
-    const handleGoogleSignIn = async () => {
-        setLoading(true)
-        try {
-          // Initialize Google Sign-In
-          await GoogleSignin.configure({
-            webClientId: '1096852808895-ljfbscrhp47ln1l7qqpnso2b0npmgstv.apps.googleusercontent.com',
-          });
-      
-          // Sign in with Google
-          const { idToken, user } = await GoogleSignin.signIn();
-      
-          // Create a Google credential from the Google ID token
-          const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    // const handleSignIn = async () => {
         
-          // Sign in with Firebase using the Google credential
-          const authResponse = await auth().signInWithCredential(googleCredential);
-          console.log('first',authResponse)
-          // Check if the user is new or existing
-          if (authResponse.additionalUserInfo.isNewUser) {
-            // Handle new user registration
-            // You can save additional user information to Firestore here
+    //     if (validation()) {
+    //       setLoading(true);
+    //       try {
+    //         const authResponse = await auth().signInWithEmailAndPassword(Email, Password);
+      
+    //         // Get user data from Firebase Realtime Database
+    //         const userSnapshot = await database()
+    //           .ref('Users/' + authResponse.user.uid)
+    //           .once('value');
+      
+    //         if (userSnapshot.exists()) {
+    //           const userData = {
+    //             userId: authResponse.user.uid,
+    //             ...userSnapshot.val(), // Include other necessary fields here
+    //           };
+    //           setLoading(false);
+      
+    //           // Dispatch the serialized user data
+    //           dispatch(adduser(userData));
+    //           // navigation.navigate('BottomTab');
+    //         } else {
+    //           setLoading(false);
+    //           Alert.alert('Error', 'User data not found in Realtime Database.');
+    //         }
+    //       } catch (error) {
+    //         console.error('Error signing in:', error.message);
+    //         setLoading(false);
+    //         Alert.alert('Error', error.message);
+    //         // Handle sign-in error, e.g., show an error message to the user
+    //       }
+    //     }
+    //   };
 
-            Alert.alert('Success', 'User registered successfully');
+
+
+
+    const handleSignIn = async () => {
+      if (validation()) {
+        setLoading(true);
+        try {
+          const authResponse = await auth().signInWithEmailAndPassword(Email, Password);
+    
+          // Get user data from Firebase Realtime Database
+          const userRef = database().ref(`Users/${authResponse.user.uid}`);
+          const userSnapshot = await userRef.once('value');
+    
+          if (userSnapshot.exists()) {
+            const userData = userSnapshot.val();
+    
+            // Check if 'tries' field exists in user data
+            if (!('tries' in userData)) {
+              // If 'tries' doesn't exist, add it with a default value of 3
+              await userRef.update({ tries: 3 });
+            }
+    
+            // Include the uid in the userData
+            userData.uid = authResponse.user.uid;
+    
+            setLoading(false);
+            dispatch(adduser(userData));
+            // Continue with the normal login process
+            // navigation.navigate('BottomTab');
+          } else {
+            setLoading(false);
+            Alert.alert('Error', 'User data not found in Realtime Database.');
           }
-      setLoading(false)
-          dispatch(adduser(authResponse.user));
-          
         } catch (error) {
-          console.error('Error signing in with Google:', error);
+          console.error('Error signing in:', error.message);
+          setLoading(false);
+          Alert.alert('Error', error.message);
           // Handle sign-in error, e.g., show an error message to the user
-          setLoading(false)
         }
-      };
+      }
+    };
+
+
+
+    // const handleGoogleSignIn = async () => {
+    //     setLoading(true)
+    //     try {
+    //       // Initialize Google Sign-In
+    //       await GoogleSignin.configure({
+    //         webClientId: '1096852808895-ljfbscrhp47ln1l7qqpnso2b0npmgstv.apps.googleusercontent.com',
+    //       });
+      
+    //       // Sign in with Google
+    //       const { idToken, user } = await GoogleSignin.signIn();
+      
+    //       // Create a Google credential from the Google ID token
+    //       const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+        
+    //       // Sign in with Firebase using the Google credential
+    //       const authResponse = await auth().signInWithCredential(googleCredential);
+    //       console.log('first',authResponse)
+    //       // Check if the user is new or existing
+    //       if (authResponse.additionalUserInfo.isNewUser) {
+    //         // Handle new user registration
+    //         // You can save additional user information to Firestore here
+
+    //         Alert.alert('Success', 'User registered successfully');
+    //       }
+    //   setLoading(false)
+    //       dispatch(adduser(authResponse.user));
+          
+    //     } catch (error) {
+    //       console.error('Error signing in with Google:', error);
+    //       // Handle sign-in error, e.g., show an error message to the user
+    //       setLoading(false)
+    //     }
+    //   };
 
      
+    const handleGoogleSignIn = async () => {
+      setLoading(true);
+      try {
+        // Initialize Google Sign-In
+        await GoogleSignin.configure({
+          webClientId: '1096852808895-ljfbscrhp47ln1l7qqpnso2b0npmgstv.apps.googleusercontent.com',
+        });
     
+        // Sign in with Google
+        const { idToken, user } = await GoogleSignin.signIn();
+    
+        // Create a Google credential from the Google ID token
+        const googleCredential = auth.GoogleAuthProvider.credential(idToken);
+    
+        // Sign in with Firebase using the Google credential
+        const authResponse = await auth().signInWithCredential(googleCredential);
+    
+        // Check if the user is new or existing
+        if (authResponse.additionalUserInfo.isNewUser) {
+          // Handle new user registration
+          // You can save additional user information to Firestore here
+    
+          // Add the user data to the Realtime Database
+          const userRef = database().ref(`Users/${authResponse.user.uid}`);
+          await userRef.set({
+            email: user.email,
+            firstname: user.givenName,
+            lastname: user.familyName,
+            // Add other user data as needed
+            tries: 3, // Set the initial value of 'tries'
+          });
+    
+          Alert.alert('Success', 'User registered successfully');
+        }
+    
+        setLoading(false);
+        dispatch(adduser(authResponse.user));
+      } catch (error) {
+        console.error('Error signing in with Google:', error);
+        // Handle sign-in error, e.g., show an error message to the user
+        setLoading(false);
+      }
+    };
     
 
     return (
@@ -158,7 +244,7 @@ export default function Signin({ navigation }) {
                 <View style={{ width: wp(90), alignSelf: 'center', height: wp(35), justifyContent: 'space-between', }}>
                     <TextInputauth1
                         emailstate={Email} setEmail={(text) => { setEmail(text), setEmailError('') }}
-                        placeholder={'Email'} Icon={require('../../assets/images/user.png')}
+                        placeholder={'Email'} Icon={require('../../assets/images/mail.png')}
                         borderWidth={EmailError ? 1 : 0}
                         borderColor={EmailError ? 'red' : null}
 

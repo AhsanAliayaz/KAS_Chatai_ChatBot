@@ -1,4 +1,4 @@
-import { View, Text, Image, TouchableOpacity, ScrollView,Alert } from 'react-native'
+import { View, Text, Image, TouchableOpacity, ScrollView, Alert, Linking } from 'react-native'
 import React, { useState, useEffect } from 'react'
 import TextInputauth1 from '../../Navigation/TextInputauth1/TextInputauth1'
 import { colors, styles, fonts } from '../Config/styles'
@@ -12,7 +12,7 @@ import firestore from '@react-native-firebase/firestore';
 // import { useSelector, useDispatch } from 'react-redux';
 import { adduser } from '../../Redux/Action/Index';
 import Loader from '../../Components/Loader/Loader';
-import { useDispatch,useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import database from '@react-native-firebase/database';
 
 
@@ -20,14 +20,21 @@ import database from '@react-native-firebase/database';
 export default function Signup({ navigation }) {
 
     const userdata = useSelector(state => state?.USER)
-//    console.log('userdata in sign up screen',userdata)
-    const firebaseDatabase = database().ref(); 
+    //    console.log('userdata in sign up screen',userdata)
+    const firebaseDatabase = database().ref();
     const dispatch = useDispatch()
     const [isChecked, setIsChecked] = useState(false);
 
     const handleCheckboxChange = (newValue) => {
         setIsChecked(newValue);
     };
+
+    // const handleSignup = () => {
+    //     if (isChecked) {
+    //       // Implement signup logic when the checkbox is checked
+    //       console.log('Signing up...');
+    //     }
+    //   };
 
     const emailCheck = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
     const [loading, setLoading] = useState(false)
@@ -88,67 +95,58 @@ export default function Signup({ navigation }) {
         return true;
     };
 
+    const privacyPolicyURL = "https://kattakappsstudio.blogspot.com/2023/04/khattak-apps-studio-user-privacy-is.html"; // Replace this with your privacy policy URL
 
-
-
-    // const handleSignup = async () => {
-    //     setLoading(true)
-    //     if (validation()) {
-    //         try {
-    //             const authResponse = await auth().createUserWithEmailAndPassword(Email, Password);
-    //             const newUser = await firestore().collection('Users').doc(`${authResponse.user.uid}`).set({
-    //                 email: Email,
-    //                 firstname: Firstname,
-    //                 lastname: LastName,
-    //             });
-    //             // User registered successfully
-    //             setLoading(false)
-    //             dispatch(adduser(newUser));
-    //             Alert.alert('Success', 'User registered successfully');
-    //             // You can also navigate to the next screen or perform other actions here
-    //         } catch (error) {
-    //             // Handle registration error
-    //             Alert.alert('Error', error.message);
-    //             setLoading(false)
-    //         }
-    //     }
-    // };
+    const handlePrivacyPolicyPress = () => {
+        Linking.openURL(privacyPolicyURL)
+            .catch(err => console.error("Error opening link:", err));
+    };
 
 
     const handleSignup = async () => {
-        setLoading(true);
-      
+        
+
         if (validation()) {
-          try {
-            // Register the user in Firebase Authentication
-            const authResponse = await auth().createUserWithEmailAndPassword(Email, Password);
-      
-            // Save user data in Firebase Realtime Database
-            await database().ref(`Users/${authResponse.user.uid}`).set({
-              email: Email,
-              firstname: Firstname,
-              lastname: LastName,
-            });
-      
-            setLoading(false);
-      
-            // Dispatch the addUser action to store the user data in Redux
-            dispatch(adduser({
-              uid: authResponse.user.uid,
-              email: Email,
-              firstname: Firstname,
-              lastname: LastName,
-            }));
-      
-            Alert.alert('Success', 'User registered successfully');
-          } catch (error) {
-            // Handle registration error
-            Alert.alert('Error', error.message);
-            setLoading(false);
-          }
+            setLoading(true);
+            try {
+                // Register the user in Firebase Authentication
+                const authResponse = await auth().createUserWithEmailAndPassword(Email, Password);
+
+                // Save user data in Firebase Realtime Database
+                await database().ref(`Users/${authResponse.user.uid}`).set({
+                    email: Email,
+                    firstname: Firstname,
+                    lastname: LastName,
+                    tries: 3,
+                });
+
+                setLoading(false);
+
+                // Dispatch the addUser action to store the user data in Redux
+                dispatch(adduser({
+                    uid: authResponse.user.uid,
+                    email: Email,
+                    firstname: Firstname,
+                    lastname: LastName,
+                }));
+
+                Alert.alert('Success', 'User registered successfully');
+            } catch (error) {
+                // Handle registration error
+                Alert.alert('Error', error.message);
+                setLoading(false);
+            }
+        }
+    };
+
+    const handlePasswordMatch = () => {
+        if (Password !== ConfirmPassword) {
+          setMatchPassword('Passwords do not match');
+          Alert.alert('Error', MatchPassword);
+        } else {
+          setMatchPassword('');
         }
       };
-
 
 
 
@@ -164,7 +162,8 @@ export default function Signup({ navigation }) {
                 </View>
 
                 <View style={{ width: wp(90), alignSelf: 'center', height: wp(20), justifyContent: 'space-between', flexDirection: 'row', }}>
-                    <TextInput2 emailstate={Firstname} setEmail={(text) => { setFirstname(text), setFirstnameError('') }} placeholder={'First Name'}
+                    <TextInput2
+                        emailstate={Firstname} setEmail={(text) => { setFirstname(text), setFirstnameError('') }} placeholder={'First Name'}
                         borderColor={FirstnameError ? 'red' : null}
                         borderWidth={FirstnameError ? 1 : 0}
                     />
@@ -177,7 +176,7 @@ export default function Signup({ navigation }) {
                 </View>
 
                 <View style={{ width: wp(90), alignSelf: 'center', height: wp(55), justifyContent: 'space-between', }}>
-                    <TextInputauth1 emailstate={Email} setEmail={(text) => { setEmail(text), setEmailError('') }} placeholder={'Email'} Icon={require('../../assets/images/user.png')}
+                    <TextInputauth1 emailstate={Email} setEmail={(text) => { setEmail(text), setEmailError('') }} placeholder={'Email'} Icon={require('../../assets/images/mail.png')}
                         borderColor={EmailError ? 'red' : null}
                         borderWidth={EmailError ? 1 : 0}
                     />
@@ -194,11 +193,11 @@ export default function Signup({ navigation }) {
                         borderWidth={ConfirmPasswordError ? 1 : 0}
                     />
 
-                {MatchPassword ? (<Text>{MatchPassword}</Text>) : null}
+                    {MatchPassword ? (<Text>{MatchPassword}</Text>) : null}
 
                 </View>
 
-                <TouchableOpacity activeOpacity={0.7} style={{ flexDirection: 'row', gap: 7, width: wp(90), alignSelf: 'center', marginVertical: wp(5), }}>
+                <TouchableOpacity onPress={() => handlePrivacyPolicyPress()} activeOpacity={0.7} style={{ flexDirection: 'row', gap: 7, width: wp(90), alignSelf: 'center', marginVertical: wp(5), }}>
                     <CheckBox
                         value={isChecked}
                         onValueChange={handleCheckboxChange}
@@ -215,21 +214,27 @@ export default function Signup({ navigation }) {
 
                 {/* Submit Button */}
                 <View style={{ ...styles.submitContainer, marginTop: 50 }}>
-                    {/* {
-        !errorMessage ? null :
-          <Text style={styles.error}>{errorMessage}</Text>
-      } */}
+                    {!isChecked ?
                     <SubmitButton
                         title={'Sign up'}
-                        style={{ width: wp(90), height: wp(14), backgroundColor: colors.secondary, borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', }}
-                        onPress={() => handleSignup()}
-                        styleText={{color: colors.white,fontSize: 14,fontFamily:fonts["Poppins-Bold"],right: wp(3),}}
+                        
+                        style={{ width: wp(90), height: wp(14), backgroundColor: colors.border, borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', }}
+                        // onPress={() => handleSignup()}
+                        styleText={{color: colors.border,fontSize: 14,fontFamily:fonts["Poppins-Bold"],right: wp(3),}}
                     />
-
+                    :
+                    <SubmitButton
+                        title={'Sign up'}
+                        
+                        style={{ width: wp(90), height: wp(14), backgroundColor: colors.secondary, borderRadius: 10, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', }}
+                        onPress={() => {handleSignup(),handlePasswordMatch()}}
+                        styleText={{color: colors.white,fontSize: 14,fontFamily:fonts["Poppins-SemiBold"],right: wp(3),}}
+                    />
+                    }
                     <TouchableOpacity style={{ marginTop: wp(5) }} onPress={() => navigation.navigate('Signin')} activeOpacity={0.7}>
                         <Text style={styles.belowSubmitText}>
                             <Text>Already have an account?   </Text>
-                            <Text style={{ color: colors.secondary,fontFamily: fonts['Poppins-SemiBold'] }}>Sign in</Text>
+                            <Text style={{ color: colors.secondary, fontFamily: fonts['Poppins-SemiBold'] }}>Sign in</Text>
                         </Text>
                     </TouchableOpacity>
                 </View>

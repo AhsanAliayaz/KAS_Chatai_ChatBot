@@ -8,8 +8,6 @@ import thunk from 'redux-thunk';
 const persistConfig = {
     key: 'root',
     storage,
-    
-  
 }
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 const store = createStore(persistedReducer,applyMiddleware(thunk))

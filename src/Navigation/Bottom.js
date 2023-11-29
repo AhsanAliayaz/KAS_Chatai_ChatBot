@@ -173,7 +173,8 @@ export default function BottomTab({ navigation }) {
                                         <Text style={[{
                                             top: wp(0.4),
                                             color: focused ? colors.secondary : 'white',
-                                             fontFamily: fonts['Poppins-SemiBold']
+                                             fontFamily: fonts['Poppins-SemiBold'],
+                                             fontSize: 10,
                                         }]}>Settings</Text>
                                     </View>
                                 ) : (

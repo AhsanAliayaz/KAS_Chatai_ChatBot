@@ -1,16 +1,53 @@
-import { View, Text,TouchableOpacity,Image,Modal } from 'react-native'
+import { View, Text,TouchableOpacity,Image,Modal,ScrollView,TouchableNativeFeedback,Alert } from 'react-native'
 import React,{useEffect,useState} from 'react'
 import { colors,styles,fonts } from '../Config/styles'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import { generalOptions,supportOptions } from '../../Constants/DummyData';
+import { generalOptions,supportOptions, } from '../../Constants/DummyData';
 import { useDispatch, useSelector } from 'react-redux';
 import { adduser } from '../../Redux/Action/Index';
-// import { logoutUser } from '../../Redux/Action/Index';
+import auth from '@react-native-firebase/auth';
+import Loader from '../../Components/Loader/Loader';
 
-
-export default function Settings({}) {
+export default function Settings({navigation}) {
   const dispatch = useDispatch()
   const [confirm, setconfirm] = useState(false);
+  const [loading, setLoading] = useState(false)
+  const userdata = useSelector(state => state?.USER)
+
+  // console.log('userdata',userdata.userData.email)
+
+
+  const handlePasswordReset = async () => {
+    try {
+      setLoading(true);
+  
+      // Check if the email is available
+      const userEmail = userdata?.userData?.email;
+  
+      if (!userEmail) {
+        // Handle the case where the email is not available
+        Alert.alert('Error', 'User email not available.');
+        setLoading(false);
+        return;
+      }
+  
+      await auth().sendPasswordResetEmail(userEmail);
+      Alert.alert(
+        'Password Reset Email Sent',
+        'Check your email for instructions to reset your password.'
+      );
+    } catch (error) {
+      // Handle errors gracefully
+      const errorMessage =
+        error.code === 'auth/user-not-found'
+          ? 'User not found. Please check the email address.'
+          : error.message || 'An error occurred while sending the reset email.';
+      
+      Alert.alert('Error', errorMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const authOptions = [
     {
@@ -18,13 +55,32 @@ export default function Settings({}) {
       subtitle: 'Log out of your account',
       icon: require('../../assets/images/logout.png'),
       onPress: () => {setconfirm(true)}
-    }
+    },
+  ]
+
+  const profile = [
+      {
+        title: 'Profile',
+        subtitle: 'View Your Personal Details',
+        icon: require('../../assets/images/12.png'),
+        onPress: () => navigation.navigate('Profile')
+      },
+      {
+      
+        title: 'Change Password',
+        subtitle: 'Change your password',
+        icon: require('../../assets/images/padlock.png'),
+        onPress: () => handlePasswordReset()
+      },
+    
   ]
 
   const data = [
+ 
     {
-      title: 'Profile',
-      options: authOptions
+      
+      title: 'Profile Settings',
+      options: profile
     },
     {
       
@@ -35,9 +91,13 @@ export default function Settings({}) {
       title: 'Support',
       options: supportOptions
     },
+    {
+      title: 'Logout',
+      options: authOptions
+    },
   ]
   return (
-  
+    <ScrollView contentContainerStyle={{flexGrow: 1,}}>
       <View style={[styles.screenMargins,{
         flex: 1,
         backgroundColor: colors.primary,
@@ -48,6 +108,8 @@ export default function Settings({}) {
       </View>
 
       <Modal animationType="slide" transparent={true} visible={confirm}>
+     
+                    <TouchableOpacity activeOpacity={1} onPress={() => setconfirm(false)} style={{flex: 1,  backgroundColor: 'rgba(129,128,128,0.8)',}}></TouchableOpacity>
                         <View
                             style={{
                                 flex: 1,
@@ -76,10 +138,13 @@ export default function Settings({}) {
                                 </Text>
                                 <View
                                     style={{
+                                      width: wp(70),
                                         flexDirection: 'row',
-                                        justifyContent: 'flex-end',
-                                        marginRight: wp(2),
-                                        marginTop: wp(5),
+                                        justifyContent: 'space-between',
+                                        // marginRight: wp(2),
+                                        // marginTop: wp(5),
+                                        alignSelf: 'center',
+                                        // backgroundColor: 'pink',
                                     }}>
                                     <TouchableOpacity
                                     activeOpacity={0.8}
@@ -100,6 +165,8 @@ export default function Settings({}) {
                                             justifyContent: 'center',
                                             backgroundColor: colors.accent,
                                             // borderRadius: wp(10),
+                                            borderWidth: 1,
+                                            borderColor: colors.secondary,
                                         }}>
                                         <Text
                                             style={{ color: colors.white, fontSize: 14, fontFamily: fonts['Poppins-SemiBold']}}>
@@ -117,7 +184,7 @@ export default function Settings({}) {
                                         style={{
                                             marginTop: wp(5),
                                             alignSelf: 'center',
-                                            backgroundColor: colors.accent,
+                                            backgroundColor: colors.secondary,
                                             borderRadius: 5,
                                             elevation: 2,
                                             width: wp(30),
@@ -134,8 +201,8 @@ export default function Settings({}) {
                                 </View>
                             </View>
                         </View>
-
-                       
+                        <TouchableOpacity  activeOpacity={1} onPress={() => setconfirm(false)} style={{flex: 1, backgroundColor: 'rgba(129,128,128,0.8)',}}></TouchableOpacity>
+                      
 
                     </Modal>
 
@@ -164,7 +231,9 @@ export default function Settings({}) {
             </View>
           ))
         }
+        <Loader visible={loading} />
       </View>
+      </ScrollView>
   
   )
 }

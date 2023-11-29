@@ -1,5 +1,7 @@
 import email from 'react-native-email'
+
 import { Linking } from 'react-native'
+
 const  handleEmail = () => {
   const to = ['khattakapps@gmail.com', ] // string or array of email addresses
   email(to, {
@@ -65,3 +67,4 @@ export const generalOptions = [
       onPress: () => {handleEmail()}
     },
   ]
+  
